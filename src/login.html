@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login</title>
+    </head>
+    <body style="margin: 0; padding: 0; border: 0;">
+        <script type="text/javascript">
+            async function validateLogin(key) {
+                var fetchResult = await fetch("./frontend/validate", {
+                    method: "POST",
+                    body: key
+                });
+                var responseJson = await fetchResult.json();
+                return responseJson.success;
+            }
+            (async() => {
+                do {
+                    let inputtedKey = prompt("Enter the admin key to access this page");
+                    if (inputtedKey !== null && inputtedKey !== "") {
+                        if (await validateLogin(inputtedKey)) break;
+                        else alert("Please enter the correct key!");
+                    }
+                } while (true);
+                window.location.reload(); // load into main page
+            })();
+        </script>
+    </body>
+</html>

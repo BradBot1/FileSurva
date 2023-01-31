@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="containers">
+            <table id="containerDisplay" border="1" style="border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="padding: 1vw;">Name</th>
+                        <th style="padding: 1vw;">Type</th>
+                        <th style="padding: 1vw;">URL</th>
+                        <th style="padding: 1vw;">Status</th>
+                        <th style="padding: 1vw;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="containers-body">
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <script type="text/javascript">
+            async function buildContainers() {
+                const containerBody = document.getElementById("containers-body");
+                containerBody.innerHTML = "";
+                const fetchData = await fetch("/frontend/container");
+                const jsonData = await fetchData.json();
+                for (const container of jsonData) {
+                    const row = document.createElement("tr");
+                    const nameColumn = document.createElement("th");
+                    nameColumn.textContent = container.name.length > 8 ? container.name.substring(0, 8) : container.name;
+                    nameColumn.id = "container-" + container.name;
+                    row.appendChild(nameColumn);
+                    const typeColumn = document.createElement("th");
+                    typeColumn.textContent = container.type;
+                    row.appendChild(typeColumn);
+                    const urlColumn = document.createElement("th");
+                    urlColumn.textContent = container.url;
+                    row.appendChild(urlColumn);
+                    const statusColumn = document.createElement("th");
+                    statusColumn.textContent = container.status;
+                    row.appendChild(statusColumn);
+                    const actionsColumn = document.createElement("th");
+                    const deleteAction = document.createElement("button");
+                    deleteAction.setAttribute("type", "button");
+                    deleteAction.textContent = "Delete";
+                    deleteAction.addEventListener("click", async (e) => {
+                        e.preventDefault();
+                        if (confirm(`Are you sure you want to delete the container "${container.name}"?`)) {
+                            const jsonData = await (await fetch("/frontend/container", {
+                                method: "DELETE",
+                                body: container.name
+                            })).json();
+                            if (jsonData.success) buildContainers();
+                            else alert(jsonData.message);
+                        }
+                    })
+                    actionsColumn.appendChild(deleteAction);
+                    row.appendChild(actionsColumn);
+                    containerBody.appendChild(row);
+                }
+                const row = document.createElement("tr");
+                const nameColumn = document.createElement("th");
+                const nameInputField = document.createElement("input");
+                nameInputField.setAttribute("type", "text");
+                nameInputField.setAttribute("placeholder", "optional");
+                nameColumn.appendChild(nameInputField);
+                row.appendChild(nameColumn);
+                const typeColumn = document.createElement("th");
+                const typeInputField = document.createElement("select");
+                const typeInputFieldOption1 = document.createElement("option");
+                typeInputFieldOption1.setAttribute("value", "ftp");
+                typeInputFieldOption1.textContent = "ftp";
+                typeInputField.appendChild(typeInputFieldOption1);
+                const typeInputFieldOption2 = document.createElement("option");
+                typeInputFieldOption2.setAttribute("value", "sftp");
+                typeInputFieldOption2.textContent = "sftp";
+                typeInputField.appendChild(typeInputFieldOption2);
+                typeColumn.appendChild(typeInputField);
+                row.appendChild(typeColumn);
+                const urlColumn = document.createElement("th");
+                const urlInputField = document.createElement("input");
+                urlInputField.setAttribute("type", "text");
+                urlInputField.setAttribute("placeholder", "required");
+                urlColumn.appendChild(urlInputField);
+                row.appendChild(urlColumn);
+                const statusColumn = document.createElement("th");
+                statusColumn.style.backgroundColor = "black";
+                row.appendChild(statusColumn);
+                const actionsColumn = document.createElement("th");
+                const createButton = document.createElement("button");
+                createButton.setAttribute("type", "button");
+                createButton.textContent = "Create";
+                createButton.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    var body = {
+                        name: nameInputField.value == "" ? undefined : nameInputField.value,
+                        type: typeInputField.value
+                    };
+                    urlInputField.value = urlInputField.value.replace(/.*:\/\//, ""); // remove protocol
+                    if (urlInputField.value.includes("@")) {
+                        body.url = urlInputField.value.substring(urlInputField.value.indexOf("@") + 1)
+                        console.log(body.url);
+                        const toCheck = urlInputField.value.substring(0, urlInputField.value.indexOf("@"));
+                        if (toCheck.includes(":")) {
+                            body.user = toCheck.substring(0, toCheck.indexOf(":")).replaceAll("<at>", "@")
+                            body.password = toCheck.substring(toCheck.indexOf(":") + 1).replaceAll("<at>", "@")
+                        } else body.user = toCheck;
+                    } else body.url = urlInputField.value;
+                    const jsonData = await (await fetch("/frontend/container", {
+                        method: 'POST',
+                        body: JSON.stringify(body)
+                    })).json();
+                    if (jsonData.success) buildContainers();
+                    else alert(jsonData.message);
+                });
+                actionsColumn.appendChild(createButton);
+                row.appendChild(actionsColumn);
+                containerBody.appendChild(row);
+                console.log("Added " + jsonData.length + " containers");
+            }
+            buildContainers();
+        </script>
+    </body>
+</html>

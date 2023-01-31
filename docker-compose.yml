@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  server:
+    image: bradbot1/filesurva
+    build: .
+    environment:
+      REDIS_HOST: redis://redis:6379
+      COOKIE_SECRET: FumosAreCool!
+      ADMIN_KEY: yek_nimdA
+      DISPLAY_HOST: localhost
+      HOST: 0.0.0.0
+    ports:
+      - ":80:80"
+    networks:
+      - app-internal
+    depends_on:
+      - redis
+    restart: always
+  redis:
+    image: redis
+    networks:
+      - app-internal
+    restart: always
+
+networks:
+  app-internal:

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Verify</title>
+    </head>
+    <body style="margin: 0; padding: 0; border: 0;">
+        <script type="text/javascript">
+            async function validateLogin(key) {
+                var fetchResult = await fetch("", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": key
+                    }
+                });
+                if (fetchResult.status === 200) {
+                    const blobData = await fetchResult.blob();
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blobData);
+                    link.setAttribute("download", window.location.href.substring(window.location.href.lastIndexOf("/") + 1));
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                    return true;
+                }
+                return false;
+            }
+            (async() => {
+                do {
+                    let inputtedKey = prompt("Enter the password to access this page");
+                    if (inputtedKey !== null && inputtedKey !== "") {
+                        if (await validateLogin(inputtedKey)) break;
+                        else alert("Please enter the correct key!");
+                    }
+                } while (true);
+            })();
+        </script>
+    </body>
+</html>
