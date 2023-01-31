@@ -1,0 +1,3 @@
+# FileSurva [![Build Status](https://ci.bb1.fun/api/badges/BradBot_1/FileSurva/status.svg?ref=refs/heads/master)](https://ci.bb1.fun/BradBot_1/FileSurva) [![Docker Pulls](https://img.shields.io/docker/pulls/bradbot1/filesurva)](https://hub.docker.com/r/bradbot1/filesurva) [![Dokcer Size](https://img.shields.io/docker/image-size/bradbot1/filesurva)](https://hub.docker.com/r/bradbot1/filesurva/tags)
+
+A simple FTP -> HTTP service that can utilise multiple FTP sources to deliver files
