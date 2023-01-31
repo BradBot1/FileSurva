@@ -10,3 +10,7 @@ steps:
       from_secret: access_token
     repo: bradbot1/filesurva
     tags: latest
+
+trigger:
+  branch:
+  - master
