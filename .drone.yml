@@ -1,0 +1,12 @@
+kind: pipeline
+name: default
+
+steps:
+- name: docker  
+  image: plugins/docker
+  settings:
+    username: bradbot1
+    password: 
+      from_secret: access_token
+    repo: bradbot1/filesurva
+    tags: latest
